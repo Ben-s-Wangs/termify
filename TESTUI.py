@@ -80,12 +80,12 @@ def build_music_player_menu(manager: ptg.WindowManager, username: str = "") -> p
         manager.toast("Signing Out")
         manager.remove(music_player_menu)
         manager.add(build_start_menu(manager))
-'''
+    '''
     def filler():
         w = ptg.Label("")
         w.size_policy = SizePolicy.FILL
         return w   
-'''
+    '''
     #row1
     btn_repeat = ptg.Button("Repeat: OFF", toggle_repeat, parent_align=ptg.HorizontalAlignment.CENTER, centered=True)
     music_player_menu += btn_repeat
