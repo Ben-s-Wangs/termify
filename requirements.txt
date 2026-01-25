@@ -1,0 +1,9 @@
+certifi==2026.1.4
+charset-normalizer==3.4.4
+deno==2.6.6
+idna==3.11
+python-vlc==3.0.21203
+requests==2.32.5
+urllib3==2.6.3
+yt-dlp==2025.12.8
+ytmusicapi==1.11.4
