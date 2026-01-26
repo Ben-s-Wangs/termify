@@ -4,6 +4,7 @@ import wave #read audio files
 import pyaudio #libraries for working w audio
 import os
 import yt_dlp
+import time
 from ytmusicapi import YTMusic #searches youtube music
 
 class AudioBackend: 
@@ -14,7 +15,7 @@ class AudioBackend:
         self.thread = None 
         self.ytmusic = YTMusic() #API object
 
-        self.chunk = 1024 # size
+        self.chunk = 4096 # size
         self.p = pyaudio.PyAudio() #controlls audio
 
         #yt - dlp download options
@@ -41,7 +42,7 @@ class AudioBackend:
     def stop_song(self):
         """Tells the audio to stop"""
         self._should_stop = True #make sure its set to stop within field
-        if (self.thread == True):
+        if (self.thread):
             self.thread.join() #stop calling the thread so it actually stops
     
     def _run_loader_andplayer(self, query):
@@ -78,9 +79,17 @@ class AudioBackend:
         self.is_playing = True #update field
 
         data = wf.readframes(self.chunk) #read first part
+        
 
         while data and not self._should_stop: #while the music shoukd be playing
-            stream.write(data)
+            try:
+                # FIX 2: Add exception_on_underflow=False
+                # This tells ALSA "If you run out of data, don't crash, just wait for me."
+                stream.write(data, exception_on_underflow=False)
+            except OSError as e:
+                # If a serious error happens, just print it and keep trying
+                print(f"Audio Glitch: {e}")
+            
             data = wf.readframes(self.chunk)
         #reset implementatio
         stream.stop_stream()
@@ -88,16 +97,4 @@ class AudioBackend:
         wf.close()
 
         self.is_playing = False #music done
-
-
-
-
-
-
-
-    
-
-
-
-
-
+ 
