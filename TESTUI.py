@@ -134,7 +134,7 @@ def build_music_player_menu(manager: ptg.WindowManager, username: str = "") -> p
     play_state = {"on": False} # local variable we will use to see
     #1. Create a interactable search
     search_input = ptg.InputField("", prompt = "Search Song: ")
-    music_player_menu = ptg.Window(width = 60, box = "DOUBLE").set_title("[210 bold]Termify").center() #just setting title, search bar using library
+    music_player_menu = ptg.Window(width = 70, box = "DOUBLE").set_title("[210 bold]Termify").center() #just setting title, search bar using library
 
     music_player_menu += ptg.Label("[bold]Now Playing[/]", parent_align=ptg.HorizontalAlignment.CENTER) # start current playing song label
 
@@ -190,7 +190,9 @@ def build_music_player_menu(manager: ptg.WindowManager, username: str = "") -> p
     music_player_menu += row3
 
     # Keybinds
-    music_player_menu.bind(ptg.keys.DOWN, lambda *_ : on_play_song())
+    music_player_menu.bind(ptg.keys.ENTER, lambda *_ : on_play_song())
+    # music_player_menu.bind(ptg.keys.CTRL_Q, lambda *_ : manager.stop())
+    music_player_menu.bind(ptg.keys.ESC, lambda *_ : on_sign_out())
 
     return music_player_menu
 
@@ -235,6 +237,8 @@ def build_start_menu(manager: ptg.WindowManager) -> ptg.Window:
 
     start_menu += buttons
     return start_menu
+
+    start_menu.bind(ptg.keys.ENTER, lambda *_ : on_login())
 
 with ptg.WindowManager() as manager:
     manager.add(build_start_menu(manager))
