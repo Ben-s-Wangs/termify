@@ -13,7 +13,7 @@ class AudioBackend:
         self.is_playing = False #initial state as music isnt played yet
         self._should_stop = False #signal code to stop
         self.thread = None 
-        self.ytmusic = YTMusic() #API object
+        self.ytmusic = YTMusic(language="en") #API object
 
         self.chunk = 4096 # size
         self.p = pyaudio.PyAudio() #controlls audio
@@ -27,8 +27,9 @@ class AudioBackend:
                 'preferredcodec': 'wav',
                 'preferredquality': '192',
             }],
-            'quiet': True,
+            'quiet': False,
             'no_warnings': False,
+            'js_runtimes': {'deno':{'venv/lib/python3.14/site-packages/deno':'path'}}
         }
 
     def play_song(self, query):
