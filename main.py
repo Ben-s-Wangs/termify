@@ -5,7 +5,7 @@ import yt_dlp
 import vlc
 import sys
 import glob
-import os
+
 # replacing hard coded strings with variables
 video_url = 'youtu.be/'
 
@@ -20,7 +20,7 @@ if len(sys.argv) >= 2:
     
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         ydl.download([video_url])
-        
+
     p = vlc.MediaPlayer(glob.glob(f'*[[]{video_id}[]].webm')[0])
     p.play()
     time.sleep(int(ytmusic.search(sys.argv[1])[0]['duration_seconds']))
