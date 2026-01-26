@@ -35,7 +35,7 @@ class AudioBackend:
         self.stop_song() #in case something is playing stop it
         self._should_stop = False
 
-        self.thread = threading.Thread(target=self._run_loader_and_player, args=(query,))
+        self.thread = threading.Thread(target=self._run_loader_andplayer, args=(query,))
         self.thread.start() #have it work in the backgroud, essentially have play and do its magic using threading library
 
     def stop_song(self):

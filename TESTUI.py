@@ -5,6 +5,8 @@ import pytermgui as ptg
 from pytermgui.file_loaders import YamlLoader
 from pytermgui.enums import SizePolicy
 from backend import AudioBackend
+
+player = AudioBackend()
 #config dictates colors @background color foreground color
 CONFIG = """
 config:
@@ -128,6 +130,70 @@ with YamlLoader() as loader:
 
 
 #     return music_player_menu
+def build_music_player_menu(manager: ptg.WindowManager, username: str = "") -> ptg.Window:
+    play_state = {"on": False} # local variable we will use to see
+    #1. Create a interactable search
+    search_input = ptg.InputField("", prompt = "Search Song: ")
+    music_player_menu = ptg.Window(width = 60, box = "DOUBLE").set_title("[210 bold]Termify").center() #just setting title, search bar using library
+
+    music_player_menu += ptg.Label("[bold]Now Playing[/]", parent_align=ptg.HorizontalAlignment.CENTER) # start current playing song label
+
+    song_label = ptg.Label("[dim]No song selected[/]", parent_align=ptg.HorizontalAlignment.CENTER)
+    music_player_menu += song_label # add default song title to menu 
+    music_player_menu += ""
+
+    music_player_menu += search_input # add search to menu
+    music_player_menu += ""
+
+    def on_play_song(*_):
+        play_state["on"] = not play_state["on"]
+
+        btn_play.label = "⏸" if play_state["on"] else "▶" # update icon
+
+        if play_state["on"]:
+            query = search_input.value
+            if query: 
+                manager.toast(f"Search for {query}...")
+                song_label.value = f"[bold]{query}[/]"
+
+                # BACKEND CONNECTION
+                player.play_song(query)
+            else:
+                manager.toast("Please enter a song name first!")
+                play_state["on"] = False # reset for no input
+                btn_play.label = "▶"
+        else:
+            manager.toast("Stopping playback")
+            player.stop_song() # backend stop
+    
+    def on_sign_out(*_):
+        player.stop_song()
+        manager.toast("Signing Out")
+        manager.remove(music_player_menu)
+        manager.add(build_start_menu(manager))
+    
+    btn_prev = ptg.Button("⏮Prev", lambda *_: manager.toast("Prev"), centered=True)
+    btn_play = ptg.Button("▶", on_play_song, centered=True)
+    btn_next = ptg.Button("Skip⏭", lambda *_: manager.toast("Skip"), centered=True)
+
+    # Row 2
+    row2 = ptg.Splitter(ptg.Label(""), btn_prev, btn_play, btn_next, ptg.Label(""))
+    row2.chars["seperator"] = ""
+    music_player_menu += row2
+    music_player_menu += ""
+
+    # Row 3
+    btn_signout = ptg.Button("Sign out", on_sign_out, centered=True)
+    btn_quit = ptg.Button("Quit", lambda *_: manager.stop(), centered=True)
+    row3 = ptg.Splitter(btn_signout, btn_quit)
+    row3.chars["Separator"] = ""
+    music_player_menu += row3
+
+    # Keybinds
+    music_player_menu.bind(ptg.keys.DOWN, lambda *_ : on_play_song())
+
+    return music_player_menu
+
 
 
 
