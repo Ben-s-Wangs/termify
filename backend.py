@@ -77,9 +77,9 @@ class AudioBackend:
         )
         self.is_playing = True #update field
 
-        data = wf.readframe(self.chunk) #read first part
+        data = wf.readframes(self.chunk) #read first part
 
-        while data and not self.stop: #while the music shoukd be playing
+        while data and not self._should_stop: #while the music shoukd be playing
             stream.write(data)
             data = wf.readframes(self.chunk)
         #reset implementatio
