@@ -4,6 +4,7 @@
 import pytermgui as ptg
 from pytermgui.file_loaders import YamlLoader
 from pytermgui.enums import SizePolicy
+from backend import AudioBackend
 #config dictates colors @background color foreground color
 CONFIG = """
 config:
@@ -41,92 +42,94 @@ config:
 with YamlLoader() as loader:
     loader.load(CONFIG)
 
-def build_music_player_menu(manager: ptg.WindowManager, username: str = "") -> ptg.Window:
-    repeat_state = {"on": False} #repeat is on no repeat is off
-    play_state = {"on": False} #play is on pause is off
-    music_player_menu = ptg.Window(width=50, box="DOUBLE").set_title("[210 bold]Termify").center()
+# def build_music_player_menu(manager: ptg.WindowManager, username: str = "") -> ptg.Window:
+#     repeat_state = {"on": False} #repeat is on no repeat is off
+#     play_state = {"on": False} #play is on pause is off
+#     music_player_menu = ptg.Window(width=50, box="DOUBLE").set_title("[210 bold]Termify").center()
 
-    music_player_menu += ptg.Label("[bold]SONGNAME[/]", parent_align=ptg.HorizontalAlignment.CENTER)#replace songname with actual song name
-    music_player_menu += ""
-    music_player_menu += ""
-    music_player_menu += ""
-    music_player_menu += ""
-    music_player_menu += ""#TODO insert some ascii stuff or sum
+#     music_player_menu += ptg.Label("[bold]SONGNAME[/]", parent_align=ptg.HorizontalAlignment.CENTER)#replace songname with actual song name
+#     music_player_menu += ""
+#     music_player_menu += ""
+#     music_player_menu += ""
+#     music_player_menu += ""
+#     music_player_menu += ""#TODO insert some ascii stuff or sum
 
-    def toggle_repeat(*_):
-        manager.toast("Pressed repeat")
-        repeat_state["on"] = not repeat_state["on"]
-        btn_repeat.label = "Repeat: ON" if repeat_state["on"] else "Repeat: OFF"
-        #Plays this song on repeat
+#     def toggle_repeat(*_):
+#         manager.toast("Pressed repeat")
+#         repeat_state["on"] = not repeat_state["on"]
+#         btn_repeat.label = "Repeat: ON" if repeat_state["on"] else "Repeat: OFF"
+#         #Plays this song on repeat
 
-    def on_play_song(*_):
-        play_state["on"] = not play_state["on"]
-        btn_play.label = "⏸" if play_state["on"] else "▶"
-        if play_state["on"]:
-            manager.toast("Playing SONGNAME")
-        else:
-            manager.toast("SONGNAME Paused")
-        #Play button, when pressed becomes pause button
+#     def on_play_song(*_):
+#         play_state["on"] = not play_state["on"]
+#         btn_play.label = "⏸" if play_state["on"] else "▶"
+#         if play_state["on"]:
+#             manager.toast("Playing SONGNAME")
+#         else:
+#             manager.toast("SONGNAME Paused")
+#         #Play button, when pressed becomes pause button
 
-    def on_skip_song(*_):
-        manager.toast("Pressed skip")
-        #Skip to next in list
+#     def on_skip_song(*_):
+#         manager.toast("Pressed skip")
+#         #Skip to next in list
 
-    def on_prev_song(*_):
-        manager.toast("Pressed prev")
-        #Replay previous in list
+#     def on_prev_song(*_):
+#         manager.toast("Pressed prev")
+#         #Replay previous in list
 
-    def on_sign_out(*_):
-        manager.toast("Signing Out")
-        manager.remove(music_player_menu)
-        manager.add(build_start_menu(manager))
-    '''
-    def filler():
-        w = ptg.Label("")
-        w.size_policy = SizePolicy.FILL
-        return w   
-    '''
-    #row1
-    btn_repeat = ptg.Button("Repeat: OFF", toggle_repeat, parent_align=ptg.HorizontalAlignment.CENTER, centered=True)
-    music_player_menu += btn_repeat
-    music_player_menu += ""
+#     def on_sign_out(*_):
+#         manager.toast("Signing Out")
+#         manager.remove(music_player_menu)
+#         manager.add(build_start_menu(manager))
+#     '''
+#     def filler():
+#         w = ptg.Label("")
+#         w.size_policy = SizePolicy.FILL
+#         return w   
+#     '''
+#     #row1
+#     btn_repeat = ptg.Button("Repeat: OFF", toggle_repeat, parent_align=ptg.HorizontalAlignment.CENTER, centered=True)
+#     music_player_menu += btn_repeat
+#     music_player_menu += ""
 
-    #row2
-    gap_left1 = ptg.Label("")
-    #gap_left2 = ptg.Label(" ")
-    btn_prev = ptg.Button("⏮Prev", on_prev_song, centered=True)
-    btn_play = ptg.Button("▶", on_play_song, centered=True)
-    btn_next = ptg.Button("Skip⏭", on_skip_song, centered=True)
-    gap_right1 = ptg.Label("")
-    #gap_right2 = ptg.Label(" ")
-    row2 = ptg.Splitter(gap_left1, btn_prev, btn_play, btn_next, gap_right1)
-    row2.chars["separator"] = ""
-    row2.styles.separator = "@235 252"
-    music_player_menu += row2
-    music_player_menu += ""
+#     #row2
+#     gap_left1 = ptg.Label("")
+#     #gap_left2 = ptg.Label(" ")
+#     btn_prev = ptg.Button("⏮Prev", on_prev_song, centered=True)
+#     btn_play = ptg.Button("▶", on_play_song, centered=True)
+#     btn_next = ptg.Button("Skip⏭", on_skip_song, centered=True)
+#     gap_right1 = ptg.Label("")
+#     #gap_right2 = ptg.Label(" ")
+#     row2 = ptg.Splitter(gap_left1, btn_prev, btn_play, btn_next, gap_right1)
+#     row2.chars["separator"] = ""
+#     row2.styles.separator = "@235 252"
+#     music_player_menu += row2
+#     music_player_menu += ""
 
-    #row3
-    btn_signout = ptg.Button("Sign Out", on_sign_out, parent_align=ptg.HorizontalAlignment.LEFT, centered=True)
-    btn_quit = ptg.Button("Quit", lambda *_: manager.stop(),parent_align=ptg.HorizontalAlignment.RIGHT, centered=True)
-    row3 = ptg.Splitter(btn_signout, btn_quit)
-    row3.chars["separator"] = ""
-    row3.styles.separator = "@235 252"
-    music_player_menu += row3
-    music_player_menu += ""
-    music_player_menu += ptg.Label("Use Arrow Keys To Toggle Repeat, Play")
-    music_player_menu += ptg.Label("Previous, Pause/Play, and Skip Ahead")
+#     #row3
+#     btn_signout = ptg.Button("Sign Out", on_sign_out, parent_align=ptg.HorizontalAlignment.LEFT, centered=True)
+#     btn_quit = ptg.Button("Quit", lambda *_: manager.stop(),parent_align=ptg.HorizontalAlignment.RIGHT, centered=True)
+#     row3 = ptg.Splitter(btn_signout, btn_quit)
+#     row3.chars["separator"] = ""
+#     row3.styles.separator = "@235 252"
+#     music_player_menu += row3
+#     music_player_menu += ""
+#     music_player_menu += ptg.Label("Use Arrow Keys To Toggle Repeat, Play")
+#     music_player_menu += ptg.Label("Previous, Pause/Play, and Skip Ahead")
 
-    for b in (btn_repeat, btn_prev, btn_play, btn_next, btn_signout, btn_quit):
-        b.chars["delimiter"] = [" ", " "]
+#     for b in (btn_repeat, btn_prev, btn_play, btn_next, btn_signout, btn_quit):
+#         b.chars["delimiter"] = [" ", " "]
 
-    #Keybinds using arrows
-    music_player_menu.bind(ptg.keys.UP, lambda *_: toggle_repeat())
-    music_player_menu.bind(ptg.keys.LEFT,  lambda *_: on_prev_song())
-    music_player_menu.bind(ptg.keys.DOWN, lambda *_: on_play_song())
-    music_player_menu.bind(ptg.keys.RIGHT, lambda *_: on_skip_song())
+#     #Keybinds using arrows
+#     music_player_menu.bind(ptg.keys.UP, lambda *_: toggle_repeat())
+#     music_player_menu.bind(ptg.keys.LEFT,  lambda *_: on_prev_song())
+#     music_player_menu.bind(ptg.keys.DOWN, lambda *_: on_play_song())
+#     music_player_menu.bind(ptg.keys.RIGHT, lambda *_: on_skip_song())
 
 
-    return music_player_menu
+#     return music_player_menu
+
+
 
 def build_start_menu(manager: ptg.WindowManager) -> ptg.Window:
     def on_login(*_):
