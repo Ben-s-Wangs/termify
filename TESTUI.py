@@ -183,7 +183,7 @@ def build_music_player_menu(manager: ptg.WindowManager, username: str = "") -> p
     music_player_menu += ""
 
     # Row 3
-    btn_signout = ptg.Button("Sign out", on_sign_out, centered=True)
+    btn_signout = ptg.Button("Log out", on_sign_out, centered=True)
     btn_quit = ptg.Button("Quit", lambda *_: manager.stop(), centered=True)
     row3 = ptg.Splitter(btn_signout, btn_quit)
     row3.chars["Separator"] = ""
@@ -199,16 +199,17 @@ def build_music_player_menu(manager: ptg.WindowManager, username: str = "") -> p
 
 def build_start_menu(manager: ptg.WindowManager) -> ptg.Window:
     def on_login(*_):
-        manager.toast("Log In Pressed")
-        login_menu = build_login_menu(manager)
+        manager.toast("Logging in")
+        # login_menu = build_login_menu(manager)
+        login_menu = build_music_player_menu(manager)
         manager.remove(start_menu)
         manager.add(login_menu)
 
     def on_create_account(*_):
         manager.toast("Create Account Pressed")
-        create_account_menu = build_create_account_menu(manager)
-        manager.remove(start_menu)
-        manager.add(create_account_menu)
+        # create_account_menu = build_create_account_menu(manager)
+        # manager.remove(start_menu)
+        # manager.add(create_account_menu)
 
     header = ptg.Container(
         ptg.Label("[bold]A Terminal Based Music Player[/]",parent_align=ptg.HorizontalAlignment.LEFT,),
@@ -221,97 +222,19 @@ def build_start_menu(manager: ptg.WindowManager) -> ptg.Window:
 
 
     btn_login = ptg.Button("Log In", on_login, centered=True)
-    btn_create = ptg.Button("Create Account", on_create_account, centered=True)
+    # btn_create = ptg.Button("Create Account", on_create_account, centered=True)
     btn_quit = ptg.Button("Quit", lambda *_: manager.stop(), centered=True)
 
     # Make the clickable/visual padding consistent (helps “hitbox vs frame” feel)
-    for b in (btn_login, btn_create, btn_quit):
+    for b in (btn_login, btn_quit):
         b.chars["delimiter"] = [" ", " "]  # 1-space padding each side
 
-    buttons = ptg.Splitter(btn_login, btn_create, btn_quit)
+    buttons = ptg.Splitter(btn_login, btn_quit)
     buttons.chars["separator"] = "   "       # spacing between buttons
     buttons.styles.separator = "@235 252"    # match background, no dark gaps
 
     start_menu += buttons
     return start_menu
-
-def build_create_account_menu(manager: ptg.WindowManager) -> ptg.Window:
-    username = ptg.InputField("", prompt="Username: ")
-    password = ptg.InputField("", prompt="Password: ")
-
-    create_account_menu = ptg.Window(width=50, box="DOUBLE").set_title("[210 bold]Termify").center()
-
-    def go_back(*_):
-        manager.toast("Back Pressed")
-        manager.remove(create_account_menu)
-        manager.add(build_start_menu(manager))  # rebuild start cleanly
-
-    def do_create_account(*_):
-        manager.toast(f"Account Created as {username.value}")
-        manager.remove(create_account_menu)
-        manager.add(build_music_player_menu(manager))
-
-    #button name, function called when pressed, center text in button frame
-    btn_back = ptg.Button("Back", go_back, centered=True)
-    btn_submit = ptg.Button("Submit", do_create_account, centered=True)
-
-    #assign spaces on either side of button text to make button look nice
-    for b in (btn_back, btn_submit):
-        b.chars["delimiter"] = [" ", " "]
-
-    #splitter function
-    actions = ptg.Splitter(btn_back, btn_submit)
-    actions.chars["separator"] = "     "
-    actions.styles.separator = "@235 252"
-
-    create_account_menu += ptg.Label("[bold] A Valid Username And Password[/]", parent_align=ptg.HorizontalAlignment.LEFT)
-    create_account_menu += ""
-    create_account_menu += username
-    create_account_menu += password
-    create_account_menu += ""
-    create_account_menu += actions
-
-    return create_account_menu
-
-
-def build_login_menu(manager: ptg.WindowManager) -> ptg.Window:
-    username = ptg.InputField("", prompt="Username: ")
-    password = ptg.InputField("", prompt="Password: ")
-
-    login_menu = ptg.Window(width=50, box="DOUBLE").set_title("[210 bold]Termify").center()
-
-    def go_back(*_):
-        manager.toast("Back Pressed")
-        manager.remove(login_menu)
-        manager.add(build_start_menu(manager))  # rebuild start cleanly
-
-    def do_login(*_):
-        manager.toast(f"Logging In As {username.value}")
-        manager.remove(login_menu)
-        manager.add(build_music_player_menu(manager))
-
-    #button name, function called when pressed, center text in button frame
-    btn_back = ptg.Button("Back", go_back, centered=True)
-    btn_submit = ptg.Button("Submit", do_login, centered=True)
-
-    #assign spaces on either side of button text to make button look nice
-    for b in (btn_back, btn_submit):
-        b.chars["delimiter"] = [" ", " "]
-
-    #splitter function
-    actions = ptg.Splitter(btn_back, btn_submit)
-    actions.chars["separator"] = "     "
-    actions.styles.separator = "@235 252"
-
-    login_menu += ptg.Label("[bold]Log In[/]", parent_align=ptg.HorizontalAlignment.LEFT)
-    login_menu += ""
-    login_menu += username
-    login_menu += password
-    login_menu += ""
-    login_menu += actions
-
-    return login_menu
-
 
 with ptg.WindowManager() as manager:
     manager.add(build_start_menu(manager))
