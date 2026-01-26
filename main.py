@@ -17,7 +17,7 @@ ydl_opts = {
         'preferredcodec': 'wav',
         'preferredquality': '192',
     }],
-    'js_runtimes': {'node':{}, 'deno':{}} # FIXME
+    'js_runtimes': {'deno':{'venv/lib/python3.14/site-packages/deno':'path'}} 
 }
 
 chunk = 1024
