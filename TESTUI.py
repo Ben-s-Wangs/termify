@@ -1,5 +1,5 @@
 # /main.py
-
+#NOT TO BE USED AS MAIN UI SIMPLY A TESTING FILE TO SEE PYTERMGUI CAPABILITIES AND LIMITATIONS
 #TestUI using pytermgui
 import pytermgui as ptg
 from pytermgui.file_loaders import YamlLoader
