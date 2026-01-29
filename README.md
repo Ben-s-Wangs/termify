@@ -5,8 +5,8 @@ A terminal user interface (TUI) music player built by Jordan Yang, Ben Wang, and
 ## Features
 
 - Clean Terminal User Interface Supporting Keyboard and Mouse
-- Play / pause / next / previous / repeat
-- Search Bar By Song Name
+- Play / Pause / Next / Previous / Repeat
+- Searchbar Using Song Names
 
 
 ## Screenshots
