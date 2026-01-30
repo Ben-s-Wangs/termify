@@ -133,26 +133,34 @@ with YamlLoader() as loader:
 def build_music_player_menu(manager: ptg.WindowManager, username: str = "") -> ptg.Window:
     play_state = {"on": False} # local variable we will use to see
     def on_play_song(*_):
-        play_state["on"] = not play_state["on"]
+        query = search_input.value
+        if not query: 
+            manager.toast("Please enter a song name first!")
+            return
 
-        # btn_play.label = "⏸" if play_state["on"] else "▶" # update icon
+        manager.toast(f"Search for {query}...")
+        song_label.value = f"[bold]{query}[/]"
+
+        # BACKEND CONNECTION
+        player.play_song(query)
+        play_state["on"] = True 
+        btn_play.label = "⏸"
+
+    def on_toggle_play(*_):
+        if not player.last_query:
+            manager.toast("Search for a song first!")
+            return
+        
+        play_state["on"] = not play_state["on"]
+        btn_play.label = "⏸" if play_state["on"] else "▶"
 
         if play_state["on"]:
-            query = search_input.value
-            if query: 
-                manager.toast(f"Search for {query}...")
-                song_label.value = f"[bold]{query}[/]"
+            manager.toast("Resuming...")
+            player.resume_song()
+        else:
+            manager.toast("Paused")
+            player.pause_song()
 
-                # BACKEND CONNECTION
-                player.play_song(query)
-            else:
-                manager.toast("Please enter a song name first!")
-                play_state["on"] = False # reset for no input
-                # btn_play.label = "▶"
-        # else:
-        #     manager.toast("Stopping playback")
-        #     player.stop_song() # backend stop
-    
     def on_sign_out(*_):
         player.stop_song()
         manager.toast("Signing Out")
@@ -169,7 +177,9 @@ def build_music_player_menu(manager: ptg.WindowManager, username: str = "") -> p
     #1. Create a interactable search: Row 1
     search_input = ptg.InputField("", prompt = "Search Song: ", centered=True)
     search_btn = ptg.Button("⌕", on_play_song, centered=True)
-    music_player_menu = ptg.Window(width = 70, box = "DOUBLE").set_title("[210 bold]Termify").center() #just setting title, search bar using library
+    row1 = ptg.Splitter(search_input, search_btn)
+    row1.set_char("separator", " ")
+    music_player_menu = ptg.Window(height = 10, width = 70, box = "DOUBLE").set_title("[210 bold]Termify").center() #just setting title, search bar using library
 
     music_player_menu += ptg.Label("[bold]Now Playing[/]", parent_align=ptg.HorizontalAlignment.CENTER) # start current playing song label
 
@@ -177,15 +187,15 @@ def build_music_player_menu(manager: ptg.WindowManager, username: str = "") -> p
     music_player_menu += song_label # add default song title to menu 
     music_player_menu += ""
 
-    music_player_menu += search_input # add search to menu
-    music_player_menu += search_btn
-    # music_player_menu += row1
+    # music_player_menu += search_input # add search to menu
+    # music_player_menu += search_btn
+    music_player_menu += row1
     music_player_menu += ""
 
 
     
     btn_prev = ptg.Button("⏮Prev", lambda *_: manager.toast("Prev"), centered=True)
-    btn_play = ptg.Button("⏸", on_play_song, centered=True)
+    btn_play = ptg.Button("⏸", on_toggle_play, centered=True)
     btn_next = ptg.Button("Skip⏭", lambda *_: manager.toast("Skip"), centered=True)
 
     # Row 2

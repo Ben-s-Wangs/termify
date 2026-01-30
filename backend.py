@@ -12,7 +12,9 @@ class AudioBackend:
         #set initial values for object
         self.is_playing = False #initial state as music isnt played yet
         self._should_stop = False #signal code to stop
+        self.is_paused = False
         self.thread = None 
+        self.last_query = ""
         self.ytmusic = YTMusic(language="en") #API object
 
         self.chunk = 4096 # size
@@ -37,17 +39,20 @@ class AudioBackend:
         self.stop_song() #in case something is playing stop it
         self._should_stop = False
 
+        self.last_query = query
+        self.is_paused = False
+
         self.thread = threading.Thread(target=self._run_loader_andplayer, args=(query,))
         self.thread.start() #have it work in the backgroud, essentially have play and do its magic using threading library
 
     def pause_song(self):
         """Pauses currently playing song or replays it if already pause"""
-        pass
+        self.is_paused = True
     
     def stop_song(self):
         """Tells the audio to stop"""
         self._should_stop = True #make sure its set to stop within field
-        if (self.thread):
+        if (self.thread and self.thread.is_alive()):
             self.thread.join() #stop calling the thread so it actually stops
     
     def _run_loader_andplayer(self, query):
@@ -92,11 +97,25 @@ class AudioBackend:
         
 
         while data and not self._should_stop: #while the music shoukd be playing
+
+            if self.is_paused:
+                if stream.is_active():
+                    stream.stop_stream()
+
+                while self.is_paused and not self._should_stop:
+                    time.sleep(0.3)
+                
+                if not self._should_stop:
+                    stream.start_stream()
+
             try:
                 # This tells ALSA "If you run out of data, don't crash, just wait for me."
                 stream.write(data, exception_on_underflow=False)
+                # time.sleep(0.01)
             except OSError as e:
                 # If a serious error happens, just print it and keep trying
+                stream.stop_stream()
+                stream.start_stream()
                 print(f"Audio Glitch: {e}")
             
             data = wf.readframes(self.chunk)
