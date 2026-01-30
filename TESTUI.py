@@ -171,6 +171,11 @@ def build_music_player_menu(manager: ptg.WindowManager, username: str = "") -> p
         manager.toast("Signing Out")
         manager.remove(music_player_menu)
         manager.add(build_start_menu(manager))
+
+    def on_quit(*_):
+        player.stop_song()
+        manager.toast("Goodbye")
+        manager.stop()
     
     btn_prev = ptg.Button("⏮Prev", lambda *_: manager.toast("Prev"), centered=True)
     btn_play = ptg.Button("▶", on_play_song, centered=True)
@@ -184,7 +189,7 @@ def build_music_player_menu(manager: ptg.WindowManager, username: str = "") -> p
 
     # Row 3
     btn_signout = ptg.Button("Log out", on_sign_out, centered=True)
-    btn_quit = ptg.Button("Quit", lambda *_: manager.stop(), centered=True)
+    btn_quit = ptg.Button("Quit", on_quit, centered=True)
     row3 = ptg.Splitter(btn_signout, btn_quit)
     row3.chars["Separator"] = ""
     music_player_menu += row3

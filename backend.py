@@ -27,8 +27,8 @@ class AudioBackend:
                 'preferredcodec': 'wav',
                 'preferredquality': '192',
             }],
-            'quiet': False,
-            'no_warnings': False,
+            'quiet': True,
+            'no_warnings': True,
             'js_runtimes': {'deno':{'venv/lib/python3.14/site-packages/deno':'path'}}
         }
 
@@ -52,12 +52,17 @@ class AudioBackend:
             #1. Search YT Music
             print(f"Searching for: {query}") #search music
             search_results = self.ytmusic.search(query)
-
+            song_index = 0
             if not search_results: #if empty return 
                 return
-            video_id = search_results[0]['videoId'] #grabs first search id from result (0 indexed)\
-            video_url = f'https://youtu.be/{video_id}' #create the url
+            while search_results[song_index]['resultType'] not in ['song', 'video'] and song_index < 10:
+                song_index += 1
+            
+            if song_index >= 10:
+                return
 
+            video_id = search_results[song_index]['videoId'] #grabs first search id from result (0 indexed)\
+            video_url = f'https://youtu.be/{video_id}' #create the url
             #2. Download the audio 
             filename = f"{video_id}.wav" 
             if not os.path.exists(filename): #check if the file has already been downloaded
