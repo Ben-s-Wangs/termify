@@ -98,6 +98,10 @@ def build_music_player_menu(manager: ptg.WindowManager, username: str = "") -> p
         manager.toast("Goodbye")
         manager.stop()
     
+    def on_prev(*_):
+        player.stop_song()
+        manager.toast("Rewinding")
+        player.play_song(player.last_query)
     
     
     #1. Create a interactable search: Row 1
@@ -105,7 +109,7 @@ def build_music_player_menu(manager: ptg.WindowManager, username: str = "") -> p
     search_btn = ptg.Button("⌕", on_play_song, centered=True)
     row1 = ptg.Splitter(search_input, search_btn)
     row1.set_char("separator", " ")
-    music_player_menu = ptg.Window(height = 10, width = 70, box = "DOUBLE").set_title("[210 bold]Termify").center() #just setting title, search bar using library
+    music_player_menu = ptg.Window(height = 10, width = 80, box = "DOUBLE").set_title("[210 bold]Termify").center() #just setting title, search bar using library
 
     music_player_menu += ptg.Label("[bold]Now Playing[/]", parent_align=ptg.HorizontalAlignment.CENTER) # start current playing song label
 
@@ -120,7 +124,7 @@ def build_music_player_menu(manager: ptg.WindowManager, username: str = "") -> p
 
 
     
-    btn_prev = ptg.Button("⏮Prev", lambda *_: manager.toast("Prev"), centered=True)
+    btn_prev = ptg.Button("⏮Prev", on_prev, centered=True)
     btn_play = ptg.Button("⏸", on_toggle_play, centered=True)
     btn_next = ptg.Button("Skip⏭", lambda *_: manager.toast("Skip"), centered=True)
 
@@ -139,8 +143,8 @@ def build_music_player_menu(manager: ptg.WindowManager, username: str = "") -> p
 
     # Keybinds
     music_player_menu.bind(ptg.keys.ENTER, lambda *_ : on_play_song())
-    # music_player_menu.bind(ptg.keys.CTRL_Q, lambda *_ : manager.stop())
-    music_player_menu.bind(ptg.keys.ESC, lambda *_ : on_sign_out())
+    music_player_menu.bind(ptg.keys.ESC, lambda *_ : manager.stop())
+    # music_player_menu.bind(ptg.keys.ESC, lambda *_ : on_sign_out())
 
     return music_player_menu
 
@@ -183,10 +187,13 @@ def build_start_menu(manager: ptg.WindowManager) -> ptg.Window:
     buttons.chars["separator"] = "   "       # spacing between buttons
     buttons.styles.separator = "@235 252"    # match background, no dark gaps
 
+    start_menu.bind(ptg.keys.ESC, lambda *_ : manager.stop())
+    start_menu.bind(ptg.keys.ENTER, on_login)
+
     start_menu += buttons
     return start_menu
 
-    start_menu.bind(ptg.keys.ENTER, lambda *_ : on_login())
+    
 
 with ptg.WindowManager() as manager:
     manager.add(build_start_menu(manager))
