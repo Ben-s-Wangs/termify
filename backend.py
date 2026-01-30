@@ -48,7 +48,9 @@ class AudioBackend:
     def pause_song(self):
         """Pauses currently playing song or replays it if already pause"""
         self.is_paused = True
-    
+    def resume_song(self):
+        self.is_paused = False
+
     def stop_song(self):
         """Tells the audio to stop"""
         self._should_stop = True #make sure its set to stop within field
@@ -101,9 +103,6 @@ class AudioBackend:
             if self.is_paused:
                 if stream.is_active():
                     stream.stop_stream()
-
-                while self.is_paused and not self._should_stop:
-                    time.sleep(0.3)
                 
                 if not self._should_stop:
                     stream.start_stream()
