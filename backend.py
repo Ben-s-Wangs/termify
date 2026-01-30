@@ -40,6 +40,10 @@ class AudioBackend:
         self.thread = threading.Thread(target=self._run_loader_andplayer, args=(query,))
         self.thread.start() #have it work in the backgroud, essentially have play and do its magic using threading library
 
+    def pause_song(self):
+        """Pauses currently playing song or replays it if already pause"""
+        pass
+    
     def stop_song(self):
         """Tells the audio to stop"""
         self._should_stop = True #make sure its set to stop within field
@@ -89,7 +93,6 @@ class AudioBackend:
 
         while data and not self._should_stop: #while the music shoukd be playing
             try:
-                # FIX 2: Add exception_on_underflow=False
                 # This tells ALSA "If you run out of data, don't crash, just wait for me."
                 stream.write(data, exception_on_underflow=False)
             except OSError as e:
