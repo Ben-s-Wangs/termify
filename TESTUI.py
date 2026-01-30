@@ -143,7 +143,7 @@ def build_music_player_menu(manager: ptg.WindowManager, username: str = "") -> p
 
     # Keybinds
     music_player_menu.bind(ptg.keys.ENTER, lambda *_ : on_play_song())
-    music_player_menu.bind(ptg.keys.ESC, lambda *_ : manager.stop())
+    music_player_menu.bind(ptg.keys.ESC, lambda *_ : (player.stop_song(), manager.stop()))
     # music_player_menu.bind(ptg.keys.ESC, lambda *_ : on_sign_out())
 
     return music_player_menu
