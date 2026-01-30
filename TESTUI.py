@@ -105,10 +105,10 @@ def build_music_player_menu(manager: ptg.WindowManager, username: str = "") -> p
     
     
     #1. Create a interactable search: Row 1
-    search_input = ptg.InputField("", prompt = "Search Song: ", centered=True)
-    search_btn = ptg.Button("⌕", on_play_song, centered=True)
-    row1 = ptg.Splitter(search_input, search_btn)
-    row1.set_char("separator", " ")
+    search_input = ptg.InputField("", prompt = "Search Song: ", centered=False, padding=0)
+    search_btn = ptg.Button("⌕", on_play_song, centered=False, padding=0, parent_align=ptg.HorizontalAlignment.RIGHT)
+    # row1 = ptg.Splitter(search_input, search_btn)
+    # row1.set_char("separator", "")
     music_player_menu = ptg.Window(height = 10, width = 80, box = "DOUBLE").set_title("[210 bold]Termify").center() #just setting title, search bar using library
 
     music_player_menu += ptg.Label("[bold]Now Playing[/]", parent_align=ptg.HorizontalAlignment.CENTER) # start current playing song label
@@ -117,10 +117,10 @@ def build_music_player_menu(manager: ptg.WindowManager, username: str = "") -> p
     music_player_menu += song_label # add default song title to menu 
     music_player_menu += ""
 
-    # music_player_menu += search_input # add search to menu
-    # music_player_menu += search_btn
-    music_player_menu += row1
-    music_player_menu += ""
+    music_player_menu += search_input # add search to menu
+    music_player_menu += search_btn
+    # music_player_menu += row1
+    # music_player_menu += ""
 
 
     
