@@ -2,21 +2,17 @@ import pytermgui as ptg
 from pytermgui.file_loaders import YamlLoader
 from pytermgui.widgets import Container 
 
-# --- CRITICAL FIX START ---
-# The library tries to do (scroll_down | scroll_up).
-# This operator (|) ONLY works on Sets, not Lists.
-# We must define them as empty sets using set().
-
+# --- WINDOWS-EXCLUSIVE BUGFIX ---
+# including container keys because they cannot be found on windows for some reason
 if not hasattr(Container, "keys"):
     Container.keys = {} 
 
 # use set() here, NOT []
 Container.keys["scroll_down"] = set() 
 Container.keys["scroll_up"] = set()
-# --- CRITICAL FIX END ---
 
 from backend import AudioBackend
-# ... rest of your code ...
+
 player = AudioBackend()
 #config dictates colors @background color foreground color
 CONFIG = """
@@ -65,10 +61,12 @@ def build_music_player_menu(manager: ptg.WindowManager, username: str = "") -> p
             return
 
         manager.toast(f"Search for {query}...")
-        song_label.value = f"[bold]{query}[/]"
 
+        def update_title_label(title):
+            song_label.value= f"[bold]{title}[/]"
+        
         # BACKEND CONNECTION
-        player.play_song(query)
+        player.play_song(query, title_callback=update_title_label)
         play_state["on"] = True 
         btn_play.label = "⏸"
 

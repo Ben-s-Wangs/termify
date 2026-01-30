@@ -16,7 +16,6 @@ class AudioBackend:
         self.thread = None 
         self.last_query = ""
         self.ytmusic = YTMusic(language="en") #API object
-
         self.chunk = 4096 # size
         self.p = pyaudio.PyAudio() #controlls audio
 
@@ -34,7 +33,7 @@ class AudioBackend:
             'js_runtimes': {'deno':{'venv/lib/python3.14/site-packages/deno':'path'}}
         }
 
-    def play_song(self, query):
+    def play_song(self, query, title_callback=None):
         """Starts searching, downloading and playing a song without interfering with UI"""
         self.stop_song() #in case something is playing stop it
         self._should_stop = False
@@ -42,8 +41,8 @@ class AudioBackend:
         self.last_query = query
         self.is_paused = False
 
-        self.thread = threading.Thread(target=self._run_loader_andplayer, args=(query,))
-        self.thread.start() #have it work in the backgroud, essentially have play and do its magic using threading library
+        self.thread = threading.Thread(target=self._run_loader_andplayer, args=(query,title_callback))
+        self.thread.start() #have it work in the background, essentially have play and do its magic using threading library
 
     def pause_song(self):
         """Pauses currently playing song or replays it if already pause"""
@@ -57,7 +56,7 @@ class AudioBackend:
         if (self.thread and self.thread.is_alive()):
             self.thread.join() #stop calling the thread so it actually stops
     
-    def _run_loader_andplayer(self, query):
+    def _run_loader_andplayer(self, query, title_callback):
         """Runs inside the background thread i.e does searching downloading and playing"""
         try: 
             #1. Search YT Music
@@ -71,7 +70,8 @@ class AudioBackend:
             
             if song_index >= 10:
                 return
-
+            if title_callback:
+                title_callback(search_results[song_index]['title'])
             video_id = search_results[song_index]['videoId'] #grabs first search id from result (0 indexed)\
             video_url = f'https://youtu.be/{video_id}' #create the url
             #2. Download the audio 
