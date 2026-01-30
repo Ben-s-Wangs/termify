@@ -100,12 +100,8 @@ class AudioBackend:
 
         while data and not self._should_stop: #while the music shoukd be playing
 
-            if self.is_paused:
-                if stream.is_active():
-                    stream.stop_stream()
-                
-                if not self._should_stop:
-                    stream.start_stream()
+            while self.is_paused and not self._should_stop:
+                time.sleep(0.1)
 
             try:
                 # This tells ALSA "If you run out of data, don't crash, just wait for me."
