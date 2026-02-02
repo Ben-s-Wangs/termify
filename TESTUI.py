@@ -100,6 +100,8 @@ def build_music_player_menu(manager: ptg.WindowManager, username: str = "") -> p
         player.stop_song()
         manager.toast("Rewinding")
         player.play_song(player.last_query)
+        play_state["on"] = True
+        btn_play.label = "⏸"
     
     
     #1. Create a interactable search: Row 1
