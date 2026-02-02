@@ -54,6 +54,7 @@ with YamlLoader() as loader:
 #     return music_player_menu
 def build_music_player_menu(manager: ptg.WindowManager, username: str = "") -> ptg.Window:
     play_state = {"on": False} # local variable we will use to see
+    # duration = 0
     def on_play_song(*_):
         query = search_input.value
         if not query: 
@@ -65,8 +66,11 @@ def build_music_player_menu(manager: ptg.WindowManager, username: str = "") -> p
         def update_title_label(title):
             song_label.value= f"[bold]{title}[/]"
         
+        def update_progress_val(val):
+            duration_label.value = val
+        
         # BACKEND CONNECTION
-        player.play_song(query, title_callback=update_title_label)
+        player.play_song(query, title_callback=update_title_label, progress_callback=update_progress_val)
         play_state["on"] = True 
         btn_play.label = "⏸"
 
@@ -122,7 +126,10 @@ def build_music_player_menu(manager: ptg.WindowManager, username: str = "") -> p
     # music_player_menu += row1
     # music_player_menu += ""
 
-
+    progress = ptg.Slider(locked=False)
+    music_player_menu += progress
+    duration_label = ptg.Label(f"-:--", centered=False, padding=0, parent_align=ptg.HorizontalAlignment.RIGHT)
+    music_player_menu += duration_label
     
     btn_prev = ptg.Button("⏮Prev", on_prev, centered=True)
     btn_play = ptg.Button("⏸", on_toggle_play, centered=True)

@@ -33,7 +33,7 @@ class AudioBackend:
             'js_runtimes': {'deno':{'venv/lib/python3.14/site-packages/deno':'path'}}
         }
 
-    def play_song(self, query, title_callback=None):
+    def play_song(self, query, title_callback=None, progress_callback=None):
         """Starts searching, downloading and playing a song without interfering with UI"""
         self.stop_song() #in case something is playing stop it
         self._should_stop = False
@@ -41,7 +41,7 @@ class AudioBackend:
         self.last_query = query
         self.is_paused = False
 
-        self.thread = threading.Thread(target=self._run_loader_andplayer, args=(query,title_callback))
+        self.thread = threading.Thread(target=self._run_loader_andplayer, args=(query,title_callback,progress_callback))
         self.thread.start() #have it work in the background, essentially have play and do its magic using threading library
 
     def pause_song(self):
@@ -56,7 +56,7 @@ class AudioBackend:
         if (self.thread and self.thread.is_alive()):
             self.thread.join() #stop calling the thread so it actually stops
     
-    def _run_loader_andplayer(self, query, title_callback):
+    def _run_loader_andplayer(self, query, title_callback, progress_callback):
         """Runs inside the background thread i.e does searching downloading and playing"""
         try: 
             #1. Search YT Music
@@ -72,6 +72,8 @@ class AudioBackend:
                 return
             if title_callback:
                 title_callback(search_results[song_index]['title'])
+            if progress_callback:
+                progress_callback(search_results[song_index]['duration'])
             video_id = search_results[song_index]['videoId'] #grabs first search id from result (0 indexed)\
             video_url = f'https://youtu.be/{video_id}' #create the url
             #2. Download the audio 
@@ -87,6 +89,8 @@ class AudioBackend:
     def _play_wav(self, filename):
         """Streams the audio into chunks from WAV files"""   
         wf = wave.open(filename, 'rb') #open file
+        frames_seen = 0
+        seconds_passed = 0
         stream = self.p.open(
             format=self.p.get_format_from_width(wf.getsampwidth()),
             channels=wf.getnchannels(), #logic to get wav stuff, might be adjusted
@@ -95,8 +99,8 @@ class AudioBackend:
         )
         self.is_playing = True #update field
 
-        data = wf.readframes(self.chunk) #read first part
-        
+        data = wf.readframes(self.chunk) # read first chunk
+        frames_seen += self.chunk
 
         while data and not self._should_stop: #while the music shoukd be playing
 
@@ -113,7 +117,9 @@ class AudioBackend:
                 stream.start_stream()
                 print(f"Audio Glitch: {e}")
             
-            data = wf.readframes(self.chunk)
+            data = wf.readframes(self.chunk) # keep reading
+            frames_seen += self.chunk
+            seconds_passed = frames_seen // wf.getframerate()
         #reset implementatio
         stream.stop_stream()
         stream.close()
