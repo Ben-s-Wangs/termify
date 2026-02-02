@@ -33,7 +33,7 @@ class AudioBackend:
             'js_runtimes': {'deno':{'venv/lib/python3.14/site-packages/deno':'path'}}
         }
 
-    def play_song(self, query, title_callback=None, progress_callback=None):
+    def play_song(self, query, title_callback=None, progress_callback=None, seconds_callback=None):
         """Starts searching, downloading and playing a song without interfering with UI"""
         self.stop_song() #in case something is playing stop it
         self._should_stop = False
@@ -41,7 +41,7 @@ class AudioBackend:
         self.last_query = query
         self.is_paused = False
 
-        self.thread = threading.Thread(target=self._run_loader_andplayer, args=(query,title_callback,progress_callback))
+        self.thread = threading.Thread(target=self._run_loader_andplayer, args=(query,title_callback,progress_callback,seconds_callback))
         self.thread.start() #have it work in the background, essentially have play and do its magic using threading library
 
     def pause_song(self):
@@ -56,7 +56,7 @@ class AudioBackend:
         if (self.thread and self.thread.is_alive()):
             self.thread.join() #stop calling the thread so it actually stops
     
-    def _run_loader_andplayer(self, query, title_callback, progress_callback):
+    def _run_loader_andplayer(self, query, title_callback, progress_callback, seconds_callback):
         """Runs inside the background thread i.e does searching downloading and playing"""
         try: 
             #1. Search YT Music
@@ -73,7 +73,7 @@ class AudioBackend:
             if title_callback:
                 title_callback(search_results[song_index]['title'])
             if progress_callback:
-                progress_callback(search_results[song_index]['duration'])
+                progress_callback(search_results[song_index]['duration_seconds'])
             video_id = search_results[song_index]['videoId'] #grabs first search id from result (0 indexed)\
             video_url = f'https://youtu.be/{video_id}' #create the url
             #2. Download the audio 
@@ -81,12 +81,12 @@ class AudioBackend:
             if not os.path.exists(filename): #check if the file has already been downloaded
                 with yt_dlp.YoutubeDL(self.ydl_opts) as ydl: 
                     ydl.download([video_url]) #download it
-            self._play_wav(filename) #download it
+            self._play_wav(filename, seconds_callback) #download it
 
         except Exception as e:
             print(f"Error in backend: {e}") #write error message
 
-    def _play_wav(self, filename):
+    def _play_wav(self, filename, seconds_callback=None):
         """Streams the audio into chunks from WAV files"""   
         wf = wave.open(filename, 'rb') #open file
         frames_seen = 0
@@ -120,6 +120,8 @@ class AudioBackend:
             data = wf.readframes(self.chunk) # keep reading
             frames_seen += self.chunk
             seconds_passed = frames_seen // wf.getframerate()
+            if seconds_callback:
+                seconds_callback(seconds_passed)
         #reset implementatio
         stream.stop_stream()
         stream.close()
