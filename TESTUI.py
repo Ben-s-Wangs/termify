@@ -69,6 +69,9 @@ def build_music_player_menu(manager: ptg.WindowManager, username: str = "") -> p
         def update_progress_val(val):
             duration_label.value = val
         
+        def update_seconds_val(seconds):
+            pass
+        
         # BACKEND CONNECTION
         player.play_song(query, title_callback=update_title_label, progress_callback=update_progress_val)
         play_state["on"] = True 
@@ -128,7 +131,9 @@ def build_music_player_menu(manager: ptg.WindowManager, username: str = "") -> p
 
     progress = ptg.Slider(locked=False)
     music_player_menu += progress
+    seconds_label = ptg.Label(f"-:--/", centered=False, padding=0, parent_align=ptg.HorizontalAlignment.RIGHT)
     duration_label = ptg.Label(f"-:--", centered=False, padding=0, parent_align=ptg.HorizontalAlignment.RIGHT)
+    music_player_menu += seconds_label
     music_player_menu += duration_label
     
     btn_prev = ptg.Button("⏮Prev", on_prev, centered=True)
