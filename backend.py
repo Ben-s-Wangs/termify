@@ -81,12 +81,12 @@ class AudioBackend:
             if not os.path.exists(filename): #check if the file has already been downloaded
                 with yt_dlp.YoutubeDL(self.ydl_opts) as ydl: 
                     ydl.download([video_url]) #download it
-            self._play_wav(filename, seconds_callback) #download it
+            self._play_wav(filename, progress_callback, seconds_callback) #download it
 
         except Exception as e:
             print(f"Error in backend: {e}") #write error message
 
-    def _play_wav(self, filename, seconds_callback=None):
+    def _play_wav(self, filename, progress_callback=None, seconds_callback=None):
         """Streams the audio into chunks from WAV files"""   
         wf = wave.open(filename, 'rb') #open file
         frames_seen = 0
@@ -101,6 +101,9 @@ class AudioBackend:
 
         data = wf.readframes(self.chunk) # read first chunk
         frames_seen += self.chunk
+
+        if progress_callback:
+            progress_callback(wf.getnframes() // wf.getframerate())
 
         while data and not self._should_stop: #while the music shoukd be playing
 
@@ -122,6 +125,8 @@ class AudioBackend:
             seconds_passed = frames_seen // wf.getframerate()
             if seconds_callback:
                 seconds_callback(seconds_passed)
+
+
         #reset implementatio
         stream.stop_stream()
         stream.close()
