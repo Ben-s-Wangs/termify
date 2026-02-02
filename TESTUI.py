@@ -53,7 +53,11 @@ with YamlLoader() as loader:
 
 # return music_player_menu
 def build_music_player_menu(manager: ptg.WindowManager, username: str = "") -> ptg.Window:
-    play_state = {"on": False} # local variable we will use to see
+    play_state = {
+        "on": False,
+        "duration": 2,
+        "current_time": 0
+    } # local state variables
     def on_play_song(*_):
         query = search_input.value
         if not query: 
@@ -66,13 +70,19 @@ def build_music_player_menu(manager: ptg.WindowManager, username: str = "") -> p
             song_label.value= f"[bold]{title}[/]"
         
         def update_progress_val(val):
-            duration_label.value = val
+            play_state["duration"] = val if val > 0 else 2
+            duration_label.value = f"{(val // 60):02d}:{(val % 60):02d}"
+        
+
         
         # BACKEND CONNECTION
-        player.play_song(query, title_callback=update_title_label, progress_callback=update_progress_val)
+        player.play_song(query, title_callback=update_title_label, progress_callback=update_progress_val, seconds_callback=update_seconds_val)
         play_state["on"] = True 
         btn_play.label = "⏸"
 
+    def update_seconds_val(seconds):
+        seconds_label.value = f"{(seconds // 60):02d}:{(seconds % 60):02d}"
+        progress.value = seconds / play_state["duration"]
     def on_toggle_play(*_):
         if not player.last_query:
             manager.toast("Search for a song first!")
@@ -102,7 +112,7 @@ def build_music_player_menu(manager: ptg.WindowManager, username: str = "") -> p
     def on_prev(*_):
         player.stop_song()
         manager.toast("Rewinding")
-        player.play_song(player.last_query)
+        player.play_song(player.last_query, seconds_callback=update_seconds_val)
         play_state["on"] = True
         btn_play.label = "⏸"
     
@@ -123,8 +133,10 @@ def build_music_player_menu(manager: ptg.WindowManager, username: str = "") -> p
 
     progress = ptg.Slider(locked=False)
     music_player_menu += progress
+    seconds_label = ptg.Label(f"-:--", centered=False, padding=0, parent_align=ptg.HorizontalAlignment.LEFT)
     duration_label = ptg.Label(f"-:--", centered=False, padding=0, parent_align=ptg.HorizontalAlignment.RIGHT)
-    music_player_menu += duration_label
+    timestamps = ptg.Splitter(seconds_label, duration_label)
+    music_player_menu += timestamps
     
     btn_prev = ptg.Button("⏮Prev", on_prev, centered=True)
     btn_play = ptg.Button("⏸", on_toggle_play, centered=True)
@@ -181,5 +193,17 @@ def build_start_menu(manager: ptg.WindowManager) -> ptg.Window:
     start_menu += buttons
     return start_menu
 
-with ptg.WindowManager() as manager:
-    manager.add(build_start_menu(manager))
+# main function to help clean exit
+if __name__ == '__main__':
+    import sys
+    try:
+        with ptg.WindowManager() as manager:
+            manager.add(build_start_menu(manager))
+    except KeyboardInterrupt:
+        pass
+    finally:
+        if 'player' in globals():
+            player.stop_song()
+
+        print("\033[?1000l\033[?1003l\033[?1006l\033[?1015l", end="")
+        sys.exit(0)
