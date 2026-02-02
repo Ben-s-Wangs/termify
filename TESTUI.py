@@ -91,7 +91,7 @@ def build_music_player_menu(manager: ptg.WindowManager, username: str = "") -> p
 
     def on_sign_out(*_):
         player.stop_song()
-        manager.toast("Signing Out")
+        manager.toast("Back To Welcome")
         manager.remove(music_player_menu)
         manager.add(build_start_menu(manager))
 
@@ -142,7 +142,7 @@ def build_music_player_menu(manager: ptg.WindowManager, username: str = "") -> p
     music_player_menu += ""
 
     # Row 3
-    btn_signout = ptg.Button("Log out", on_sign_out, centered=True)
+    btn_signout = ptg.Button("Back to Menu", on_sign_out, centered=True)
     btn_quit = ptg.Button("Quit", on_quit, centered=True)
     row3 = ptg.Splitter(btn_signout, btn_quit)
     row3.chars["separator"] = ""
@@ -160,7 +160,7 @@ def build_music_player_menu(manager: ptg.WindowManager, username: str = "") -> p
 
 def build_start_menu(manager: ptg.WindowManager) -> ptg.Window:
     def on_login(*_):
-        manager.toast("Logging in")
+        manager.toast("Starting Music Player")
         # login_menu = build_login_menu(manager)
         login_menu = build_music_player_menu(manager)
         manager.remove(start_menu)
@@ -174,7 +174,7 @@ def build_start_menu(manager: ptg.WindowManager) -> ptg.Window:
 
     header = ptg.Container(
         ptg.Label("[bold]A Terminal Based Music Player[/]",parent_align=ptg.HorizontalAlignment.LEFT,),
-        ptg.Label("Made by:\nJordan Yang\nBen Wang\nMichael Ampong\nAshish Tomar\nFor the DEV.0 Hackathon",
+        ptg.Label("Made by:\nJordan Yang\nBen Wang\nMichael Ampong\nFor the DEV.0 Hackathon",
         parent_align=ptg.HorizontalAlignment.LEFT,),box="EMPTY_VERTICAL",width=60,
     )
 
@@ -182,7 +182,7 @@ def build_start_menu(manager: ptg.WindowManager) -> ptg.Window:
 
 
 
-    btn_login = ptg.Button("Log In", on_login, centered=True)
+    btn_login = ptg.Button("Start", on_login, centered=True)
     # btn_create = ptg.Button("Create Account", on_create_account, centered=True)
     btn_quit = ptg.Button("Quit", lambda *_: manager.stop(), centered=True)
 
