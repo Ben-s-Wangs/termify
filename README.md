@@ -31,10 +31,10 @@ Music Player Menu
 - Search: Enter
 - Back: Ctrl + b
 - Play / Pause: Ctrl + p
-
+- Rewind: Ctrl + r
 - Quit: Escape
 
-## Requirements And Installation #prolly right double check
+## Requirements And Installation
 -FFmpeg MUST BE INSTALLED TO USE TERMIFY
 winget install FFmpeg
 
