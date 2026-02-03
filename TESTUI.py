@@ -147,6 +147,8 @@ def build_music_player_menu(manager: ptg.WindowManager, username: str = "") -> p
     music_player_menu.bind(ptg.keys.ENTER, lambda *_ : on_play_song()) #search song
     music_player_menu.bind(ptg.keys.ESC, lambda *_ : (player.stop_song(), manager.stop())) #quit
     music_player_menu.bind(ptg.keys.CTRL_P, lambda *_ : on_toggle_play()) #play/pause
+    music_player_menu.bind(ptg.keys.CTRL_B, lambda *_ : on_back()) #back to main menu
+
 
     return music_player_menu
 
