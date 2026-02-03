@@ -108,6 +108,13 @@ def build_music_player_menu(manager: ptg.WindowManager, username: str = "") -> p
         player.stop_song()
         manager.toast("Goodbye")
         manager.stop()
+
+    def on_rewind(*_): #rewind logic
+        player.stop_song()
+        manager.toast("Rewinding...")
+        player.play_song(player.last_query, seconds_callback=update_seconds_val)
+        play_state["on"] = True
+        btn_play.label = "⏸"
     
     
     #Create a interactable search: Top Row 
@@ -137,17 +144,23 @@ def build_music_player_menu(manager: ptg.WindowManager, username: str = "") -> p
     #Bottom Row Buttons
     btn_back = ptg.Button("Back to Menu", on_back, centered=True)
     btn_play = ptg.Button("⏸", on_toggle_play, centered=True)
+    btn_rewind = ptg.Button("↩️   Rewind", on_rewind, centered=True)
     btn_quit = ptg.Button("Quit", on_quit, centered=True)
 
     bottom_row = ptg.Splitter(btn_back, btn_play, btn_quit)
     bottom_row.chars["separator"] = ""
     music_player_menu += bottom_row
 
+    #Real Bottom Row
+    music_player_menu += ""
+    music_player_menu += btn_rewind
+
     # Keybinds
     music_player_menu.bind(ptg.keys.ENTER, lambda *_ : on_play_song()) #search song
     music_player_menu.bind(ptg.keys.ESC, lambda *_ : (player.stop_song(), manager.stop())) #quit
     music_player_menu.bind(ptg.keys.CTRL_P, lambda *_ : on_toggle_play()) #play/pause
     music_player_menu.bind(ptg.keys.CTRL_B, lambda *_ : on_back()) #back to main menu
+    music_player_menu.bind(ptg.keys.CTRL_R, lambda *_ : on_rewind()) #rewind
 
 
     return music_player_menu
