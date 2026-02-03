@@ -14,13 +14,16 @@ Spotify and YouTube Music that requires you to either go Premium or suffer ad br
 
 ## Screenshots
 Welome Screen
-<img width="1465" height="750" alt="image" src="https://github.com/user-attachments/assets/72dcfdad-eb4c-4577-9c15-52fcbb1d3318" />
+<img width="1481" height="757" alt="image" src="https://github.com/user-attachments/assets/2100b50c-c6a1-4d50-b774-d6944d900d39" />
+
 
 Main User Interface
-<img width="1465" height="750" alt="image" src="https://github.com/user-attachments/assets/11cdb0a3-1080-46d6-93f5-6989c7a56874" />
+<img width="1482" height="759" alt="image" src="https://github.com/user-attachments/assets/f7f14d52-15f4-4bdd-9589-5027a5d78c23" />
+
 
 Playing Music
-<img width="1465" height="750" alt="image" src="https://github.com/user-attachments/assets/143872b6-bb04-4770-9568-3cd9afc80915" />
+<img width="1469" height="754" alt="image" src="https://github.com/user-attachments/assets/5602a75d-ac0a-4657-ab81-ca5594a045e7" />
+
 
 
 ## Keybinds
