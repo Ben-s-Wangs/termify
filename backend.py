@@ -89,8 +89,7 @@ class AudioBackend:
     def _play_wav(self, filename, progress_callback=None, seconds_callback=None):
         """Streams the audio into chunks from WAV files"""   
         wf = wave.open(filename, 'rb') #open file
-        frames_seen = 0
-        seconds_passed = 0
+
         stream = self.p.open(
             format=self.p.get_format_from_width(wf.getsampwidth()),
             channels=wf.getnchannels(), #logic to get wav stuff, might be adjusted
@@ -99,38 +98,39 @@ class AudioBackend:
         )
         self.is_playing = True #update field
 
-        data = wf.readframes(self.chunk) # read first chunk
-        frames_seen += self.chunk
-
         if progress_callback:
             progress_callback(wf.getnframes() // wf.getframerate())
+        try:
+            while not self._should_stop:
+                wf.rewind()
+                frames_seen = 0
+                if seconds_callback:
+                    seconds_callback(0)
+                data = wf.readframes(self.chunk)
 
-        while data and not self._should_stop: #while the music shoukd be playing
+                while data and not self._should_stop: #while the music should be playing
+                    while self.is_paused and not self._should_stop:
+                        time.sleep(0.1)
 
-            while self.is_paused and not self._should_stop:
-                time.sleep(0.1)
+                    try:
+                        # This tells ALSA "If you run out of data, don't crash, just wait for me."
+                        stream.write(data, exception_on_underflow=False)
+                        # time.sleep(0.01)
+                    except OSError as e:
+                        # If a serious error happens, just print it and keep trying
+                        stream.stop_stream()
+                        stream.start_stream()
+                        print(f"Audio Glitch: {e}")
+                    
+                    frames_seen += self.chunk
+                    if seconds_callback:
+                        seconds_callback(frames_seen // wf.getframerate())
+                    data = wf.readframes(self.chunk)
 
-            try:
-                # This tells ALSA "If you run out of data, don't crash, just wait for me."
-                stream.write(data, exception_on_underflow=False)
-                # time.sleep(0.01)
-            except OSError as e:
-                # If a serious error happens, just print it and keep trying
-                stream.stop_stream()
-                stream.start_stream()
-                print(f"Audio Glitch: {e}")
-            
-            data = wf.readframes(self.chunk) # keep reading
-            frames_seen += self.chunk
-            seconds_passed = frames_seen // wf.getframerate()
-            if seconds_callback:
-                seconds_callback(seconds_passed)
+        #reset implementation at end of song
+        finally:
+            stream.stop_stream()
+            stream.close()
+            wf.close()
 
-
-        #reset implementatio
-        stream.stop_stream()
-        stream.close()
-        wf.close()
-
-        self.is_playing = False #music done
- 
+            self.is_playing = False #music done

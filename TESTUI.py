@@ -15,6 +15,7 @@ from backend import AudioBackend
 
 player = AudioBackend()
 #config dictates colors following the format @background color foreground color
+#See pytermgui documentation for more info on styling
 CONFIG = """
 config:
   Window:
@@ -51,6 +52,7 @@ config:
 with YamlLoader() as loader:
     loader.load(CONFIG)
 
+#Menus are built using functions to allow for easy switching between them by adding and removing them from the window manager
 # return music_player_menu
 def build_music_player_menu(manager: ptg.WindowManager, username: str = "") -> ptg.Window:
     play_state = {
@@ -60,63 +62,55 @@ def build_music_player_menu(manager: ptg.WindowManager, username: str = "") -> p
     } # local state variables
     def on_play_song(*_):
         query = search_input.value
-        if not query: 
-            manager.toast("Please enter a song name first!")
+        if not query: #Cant play music if a song wasnt searched
+            manager.toast("Please Enter A Song Name First!")
             return
 
         manager.toast(f"Search for {query}...")
 
-        def update_title_label(title):
+        def update_title_label(title): #update song title label
             song_label.value= f"[bold]{title}[/]"
         
-        def update_progress_val(val):
+        def update_progress_val(val): #update progress bar and duration
             play_state["duration"] = val if val > 0 else 2
             duration_label.value = f"{(val // 60):02d}:{(val % 60):02d}"
-        
-
         
         # BACKEND CONNECTION
         player.play_song(query, title_callback=update_title_label, progress_callback=update_progress_val, seconds_callback=update_seconds_val)
         play_state["on"] = True 
         btn_play.label = "⏸"
 
-    def update_seconds_val(seconds):
+    def update_seconds_val(seconds): #update seconds label and progress bar
         seconds_label.value = f"{(seconds // 60):02d}:{(seconds % 60):02d}"
         progress.value = seconds / play_state["duration"]
-    def on_toggle_play(*_):
-        if not player.last_query:
-            manager.toast("Search for a song first!")
+    def on_toggle_play(*_): #play/pause button logic
+        if not player.last_query: #Cant play/pause if no song was played
+            manager.toast("Search For A Song First!")
             return
         
         play_state["on"] = not play_state["on"]
-        btn_play.label = "⏸" if play_state["on"] else "▶"
+        btn_play.label = "⏸" if play_state["on"] else "▶" #Change the button label accordingly
 
-        if play_state["on"]:
+        if play_state["on"]: #resume or pause song
             manager.toast("Resuming...")
             player.resume_song()
         else:
             manager.toast("Paused")
             player.pause_song()
 
-    def on_sign_out(*_):
+    def on_back(*_): #back to main menu logic
         player.stop_song()
         manager.toast("Back To Welcome")
         manager.remove(music_player_menu)
         manager.add(build_start_menu(manager))
 
-    def on_quit(*_):
+    def on_quit(*_): #quit logic
         player.stop_song()
         manager.toast("Goodbye")
         manager.stop()
     
-    def on_prev(*_):
-        player.stop_song()
-        manager.toast("Rewinding")
-        player.play_song(player.last_query, seconds_callback=update_seconds_val)
-        play_state["on"] = True
-        btn_play.label = "⏸"
     
-    #1. Create a interactable search: Row 1
+    #Create a interactable search: Top Row 
     search_input = ptg.InputField("", prompt = "Search Song: ", centered=False, padding=0)
     search_btn = ptg.Button("⌕", on_play_song, centered=False, padding=0, parent_align=ptg.HorizontalAlignment.RIGHT)
 
@@ -136,31 +130,27 @@ def build_music_player_menu(manager: ptg.WindowManager, username: str = "") -> p
     seconds_label = ptg.Label(f"-:--", centered=False, padding=0, parent_align=ptg.HorizontalAlignment.LEFT)
     duration_label = ptg.Label(f"-:--", centered=False, padding=0, parent_align=ptg.HorizontalAlignment.RIGHT)
     timestamps = ptg.Splitter(seconds_label, duration_label)
+    timestamps.chars["separator"] = ""
     music_player_menu += timestamps
     
-    btn_prev = ptg.Button("⏮Prev", on_prev, centered=True)
+
+    #Bottom Row Buttons
+    btn_back = ptg.Button("Back to Menu", on_back, centered=True)
     btn_play = ptg.Button("⏸", on_toggle_play, centered=True)
-    btn_skip = ptg.Button("Skip⏭", lambda *_: manager.toast("Skip"), centered=True)
-
-    # Row 2
-    row2 = ptg.Splitter(ptg.Label(""), btn_prev, btn_play, btn_skip, ptg.Label(""))
-    row2.chars["separator"] = ""
-    music_player_menu += row2
-    music_player_menu += ""
-
-    # Row 3
-    btn_signout = ptg.Button("Back to Menu", on_sign_out, centered=True)
     btn_quit = ptg.Button("Quit", on_quit, centered=True)
-    row3 = ptg.Splitter(btn_signout, btn_quit)
-    row3.chars["separator"] = ""
-    music_player_menu += row3
+
+    bottom_row = ptg.Splitter(btn_back, btn_play, btn_quit)
+    bottom_row.chars["separator"] = ""
+    music_player_menu += bottom_row
 
     # Keybinds
-    music_player_menu.bind(ptg.keys.ENTER, lambda *_ : on_play_song())
-    music_player_menu.bind(ptg.keys.ESC, lambda *_ : (player.stop_song(), manager.stop()))
+    music_player_menu.bind(ptg.keys.ENTER, lambda *_ : on_play_song()) #search song
+    music_player_menu.bind(ptg.keys.ESC, lambda *_ : (player.stop_song(), manager.stop())) #quit
+    music_player_menu.bind(ptg.keys.CTRL_P, lambda *_ : on_toggle_play()) #play/pause
 
     return music_player_menu
 
+#Function to build the start menu
 def build_start_menu(manager: ptg.WindowManager) -> ptg.Window:
     def on_start(*_):
         manager.toast("Starting Music Player")
