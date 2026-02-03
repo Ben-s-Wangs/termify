@@ -1,31 +1,34 @@
 # 🎵 Termify
 
-A terminal user interface (TUI) music player built by Jordan Yang, Ben Wang, and Michael Ampong for the 2025-2026 Dev.0 Hackathon
+A terminal user interface (TUI) music player built by Jordan Yang, Ben Wang, and Michael Ampong for the 2025-2026 Dev.0 Hackathon designed to play a song on repeat.
+Spotify and YouTube Music that requires you to either go Premium or suffer ad breaks if you are trying to listen to something on repeat, Termify offers a light-weight and simple alternative.
 
 ## Features
 - Clean Minimalistic Terminal User Interface
-- Play / Pause, Repeat, And ____ Functions And Keybind Support
+- Keybind Support (Keybind Mapping Shown Below)
+- Play / Pause
+- Plays Your Song On Repeat Without Breaks Or Interuptions
 - Working Search Bar By Song Name
 - Features All Songs Found On YouTube Music
 
 
 ## Screenshots
 Welome Screen
-<img width="787" height="441" alt="image" src="https://github.com/user-attachments/assets/ba529bbb-7ec0-4d9a-90cb-2da3c7493513" />
+<img width="1465" height="750" alt="image" src="https://github.com/user-attachments/assets/72dcfdad-eb4c-4577-9c15-52fcbb1d3318" />
+
 
 Main User Interface
-<img width="648" height="427" alt="image" src="https://github.com/user-attachments/assets/e94f2a4a-ece4-4675-87e2-d180de268e34" />
+<img width="1465" height="750" alt="image" src="https://github.com/user-attachments/assets/11cdb0a3-1080-46d6-93f5-6989c7a56874" />
 
-Search bar
 
-(test images to be updated with final version)
+Playing Music
+<img width="1465" height="750" alt="image" src="https://github.com/user-attachments/assets/143872b6-bb04-4770-9568-3cd9afc80915" />
+
 
 ## Keybinds
 - Escape: Quit
 - Search: Enter
-- Repeat: Ctrl + q #to be added
-- Play / Pause: Ctrl + w #to be added
-- Skip: Ctrl + e #skip should probably be changed to something else unless queue function is added
+- Play / Pause: Ctrl + p #to be added
 
 ## Requirements And Installation #prolly right double check
 -FFmpeg MUST BE INSTALLED TO USE TERMIFY
